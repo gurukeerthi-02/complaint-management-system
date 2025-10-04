@@ -17,8 +17,6 @@ public class ComplaintRequest {
 
     private String priority = "MEDIUM";
 
-    private String imageUrl;
-
     public ComplaintRequest() {}
 
     public String getTitle() { return title; }
@@ -35,7 +33,4 @@ public class ComplaintRequest {
 
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }
-
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

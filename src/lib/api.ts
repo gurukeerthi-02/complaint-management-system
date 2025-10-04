@@ -6,7 +6,6 @@ class ApiService {
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
-        ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
       },
       ...options,
     };
@@ -27,7 +26,6 @@ class ApiService {
       body: JSON.stringify({ email, password }),
     });
     
-    localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     return response;
   }
@@ -38,7 +36,6 @@ class ApiService {
       body: JSON.stringify({ email, password, fullName, phone }),
     });
     
-    localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     return response;
   }
@@ -49,16 +46,34 @@ class ApiService {
     category: string;
     location: string;
     priority?: string;
-    imageUrl?: string;
-  }) {
-    return this.request('/complaints', {
+  }, photo?: File | null) {
+    const formData = new FormData();
+    formData.append('title', complaint.title);
+    formData.append('description', complaint.description);
+    formData.append('category', complaint.category);
+    formData.append('location', complaint.location);
+    formData.append('priority', complaint.priority || 'MEDIUM');
+    
+    const currentUser = this.getCurrentUser();
+    if (currentUser?.email) {
+      formData.append('userEmail', currentUser.email);
+    }
+    
+    if (photo) {
+      formData.append('photo', photo);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/complaints`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(complaint),
+      body: formData,
     });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Request failed');
+    }
+
+    return response.json();
   }
 
   async getComplaints() {
@@ -83,12 +98,11 @@ class ApiService {
   }
 
   logout() {
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
   }
 
   isAuthenticated() {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem('user');
   }
 
   getCurrentUser() {
@@ -108,7 +122,7 @@ export type Complaint = {
   status: 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' | 'REJECTED';
   priority: 'LOW' | 'MEDIUM' | 'HIGH';
   upvotes: number;
-  imageUrl?: string;
+  photoUrl?: string;
   createdAt: string;
   updatedAt: string;
   userEmail: string;

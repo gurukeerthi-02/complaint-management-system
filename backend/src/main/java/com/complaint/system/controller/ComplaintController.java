@@ -30,21 +30,20 @@ public class ComplaintController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> createComplaint(@Valid @RequestBody ComplaintRequest request, 
-                                           Authentication authentication) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createComplaint(
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("category") String category,
+            @RequestParam("location") String location,
+            @RequestParam("priority") String priority,
+            @RequestParam(value = "userEmail", required = false) String userEmail,
+            @RequestParam(value = "photo", required = false) MultipartFile photo) {
         try {
-            User user = userService.findByEmail(authentication.getName())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            User user = getUserByEmail(userEmail);
             
             Complaint complaint = complaintService.createComplaint(
-                request.getTitle(),
-                request.getDescription(),
-                request.getCategory(),
-                request.getLocation(),
-                request.getPriority(),
-                request.getImageUrl(),
-                user
+                title, description, category, location, priority, photo, user
             );
             
             return ResponseEntity.ok(complaint);
@@ -77,19 +76,19 @@ public class ComplaintController {
             if (complaintService.getAllComplaints().isEmpty()) {
                 complaintService.createComplaint("Broken Street Light", 
                     "Street light on Main Street has been out for 3 days", 
-                    "electricity", "Main Street near City Hall", "MEDIUM", "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", user);
+                    "electricity", "Main Street near City Hall", "MEDIUM", null, user);
                     
                 complaintService.createComplaint("Large Pothole", 
                     "Dangerous pothole causing vehicle damage", 
-                    "roads", "Oak Avenue and 5th Street", "HIGH", "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400", user);
+                    "roads", "Oak Avenue and 5th Street", "HIGH", null, user);
                     
                 complaintService.createComplaint("Overflowing Trash Bins", 
                     "Garbage bins in Central Park are overflowing", 
-                    "waste", "Central Park entrance", "LOW", "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400", user);
+                    "waste", "Central Park entrance", "LOW", null, user);
                     
                 complaintService.createComplaint("Water Leak", 
                     "Water main leak flooding the sidewalk", 
-                    "water", "Pine Street", "HIGH", "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400", user);
+                    "water", "Pine Street", "HIGH", null, user);
             }
             
             return ResponseEntity.ok(Map.of("message", "Sample data created successfully"));

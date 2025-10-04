@@ -56,9 +56,6 @@ public class Complaint {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
     public enum Status {
         PENDING, IN_PROGRESS, RESOLVED, REJECTED
     }
@@ -115,9 +112,6 @@ public class Complaint {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public String getPhotoUrl() { return photoUrl; }
     public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
