@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .complaint { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Backend Admin Panel</h1>
+    
+    <button onclick="testBackend()">Test Backend</button>
+    <button onclick="populateData()">Populate Sample Data</button>
+    <button onclick="fetchComplaints()">Fetch All Complaints</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        async function testBackend() {
+            try {
+                const response = await fetch('http://localhost:8080/api/complaints/test');
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="result">✅ Backend is working: ${data.message}</div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function populateData() {
+            try {
+                const response = await fetch('http://localhost:8080/api/complaints/populate');
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="result">✅ ${data.message || data.error}</div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function fetchComplaints() {
+            try {
+                const response = await fetch('http://localhost:8080/api/complaints');
+                const complaints = await response.json();
+                
+                let html = `<div class="result">Found ${complaints.length} complaints:</div>`;
+                complaints.forEach((complaint, index) => {
+                    html += `
+                        <div class="complaint">
+                            <h3>${complaint.title}</h3>
+                            <p><strong>Status:</strong> ${complaint.status}</p>
+                            <p><strong>Priority:</strong> ${complaint.priority}</p>
+                            <p><strong>Location:</strong> ${complaint.location}</p>
+                            <p><strong>Description:</strong> ${complaint.description}</p>
+                            <p><strong>Upvotes:</strong> ${complaint.upvotes}</p>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
