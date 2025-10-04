@@ -6,7 +6,7 @@ A full-stack complaint management system with Spring Boot backend and React fron
 
 - **Backend**: Spring Boot with PostgreSQL
 - **Frontend**: React with TypeScript and Tailwind CSS
-- **Authentication**: JWT-based authentication
+- **Authentication**: JWT-based authentication (not done yet)
 - **Database**: PostgreSQL with JPA/Hibernate
 
 ## Prerequisites
